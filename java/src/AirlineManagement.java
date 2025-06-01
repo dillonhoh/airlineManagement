@@ -379,7 +379,26 @@ public class AirlineManagement {
     * @return User login or null is the user does not exist
     **/
    public static String LogIn(AirlineManagement esql){
-      return null;
+      try {
+        System.out.print("\tEnter username: ");
+        String username = in.readLine();
+        System.out.print("\tEnter password: ");
+        String password = in.readLine();
+
+        String query = String.format("SELECT role FROM Users WHERE username = '%s' AND password = '%s';", username, password);
+        List<List<String>> results = esql.executeQueryAndReturnResult(query);
+
+        if (results.size() > 0) {
+            System.out.println("Login successful!");
+            return username + "|" + results.get(0).get(0); // e.g., "johndoe|Manager"
+        } else {
+            System.out.println("User not found or password incorrect.");
+            return null;
+        }
+    } catch (Exception e) {
+        System.err.println("Error in LogIn: " + e.getMessage());
+        return null;
+    }
    }//end
 
 // Rest of the functions definition go in here
