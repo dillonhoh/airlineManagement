@@ -110,8 +110,7 @@ CREATE TABLE MaintenanceRequest (
 );
 
 CREATE TABLE Users (
-   userID PRIMARY KEY,
-   name TEXT,
+   userID SERIAL PRIMARY KEY,
    username TEXT UNIQUE NOT NULL,
    password TEXT NOT NULL,
    role text NOT NULL

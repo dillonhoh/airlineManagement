@@ -358,14 +358,14 @@ public class AirlineManagement {
     **/
    public static void CreateUser(AirlineManagement esql){
       try {
-        System.out.print("\tEnter name: ");
-        String name = in.readLine();
+        System.out.print("\tEnter username: ");
+        String username = in.readLine();
         System.out.print("\tEnter password: ");
         String password = in.readLine();
         System.out.print("\tEnter role (Customer, Manager, Pilot, Technician): ");
         String role = in.readLine();
 
-        String query = String.format("INSERT INTO Users (name, password, role) VALUES ('%s','%s','%s');", name, password, role);
+        String query = String.format("INSERT INTO Users (username, password, role) VALUES ('%s','%s','%s');", username, password, role);
         esql.executeUpdate(query);
         System.out.println("User successfully created!");
     } catch (Exception e) {
