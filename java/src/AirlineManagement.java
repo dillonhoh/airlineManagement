@@ -362,8 +362,13 @@ public class AirlineManagement {
         String username = in.readLine();
         System.out.print("\tEnter password: ");
         String password = in.readLine();
-        System.out.print("\tEnter role (Customer, Manager, Pilot, Technician): ");
+        System.out.print("\tEnter role: ");
         String role = in.readLine();
+
+        if (!role.equals("Customer") && !role.equals("Manager") && !role.equals("Pilot") && !role.equals("Technician")) {
+         System.out.println("Invalid role! Please enter a valid role.");
+            return;
+         }
 
         String query = String.format("INSERT INTO Users (username, password, role) VALUES ('%s','%s','%s');", username, password, role);
         esql.executeUpdate(query);
