@@ -257,6 +257,7 @@ public class AirlineManagement {
             System.out.println("2. Log in");
             System.out.println("9. < EXIT");
             String authorisedUser = null;
+
             switch (readChoice()){
                case 1: CreateUser(esql); break;
                case 2: authorisedUser = LogIn(esql); break;
@@ -265,7 +266,13 @@ public class AirlineManagement {
             }//end switch
             if (authorisedUser != null) {
               boolean usermenu = true;
+              String[] parts = authorisedUser.split("\\|");
+               authorisedUser = parts[0];
+               String userRole = parts[1];
+               System.out.println(authorisedUser);
+               System.out.println(userRole);
               while(usermenu) {
+               
                 System.out.println("MAIN MENU");
                 System.out.println("---------");
 
