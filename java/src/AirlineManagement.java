@@ -272,10 +272,9 @@ public class AirlineManagement {
                System.out.println(authorisedUser);
                System.out.println(userRole);
               while(usermenu) {
-               
                 System.out.println("MAIN MENU");
                 System.out.println("---------");
-
+               if(userRole.equals("Manager")){
                 //**the following functionalities should only be able to be used by Management**
                 System.out.println("1. View Flights");
                 System.out.println("2. View Flight Seats");
@@ -284,21 +283,24 @@ public class AirlineManagement {
                 System.out.println("5. View Full Order ID History");
                 System.out.println(".........................");
                 System.out.println(".........................");
-
+               }
+               else if(userRole.equals("Customer")){
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("10. Search Flights");
                 System.out.println(".........................");
                 System.out.println(".........................");
-
+               }
+               else if(userRole.equals("Pilot")){
                 //**the following functionalities should ony be able to be used by Pilots**
                 System.out.println("15. Maintenace Request");
                 System.out.println(".........................");
                 System.out.println(".........................");
-
+               }
+               else if(userRole.equals("Technician")){
                //**the following functionalities should ony be able to be used by Technicians**
                 System.out.println(".........................");
                 System.out.println(".........................");
-
+               }
                 System.out.println("20. Log out");
                 switch (readChoice()){
                    case 1: feature1(esql); break;
