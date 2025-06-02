@@ -373,7 +373,6 @@ public class AirlineManagement {
             System.out.println("Username cannot be empty, Please try again and enter a valid username.");
             return;
         }
-
         String checkUserQuery = String.format("SELECT * FROM Users WHERE username = '%s';", username);
         List<List<String>> userCheckResult = esql.executeQueryAndReturnResult(checkUserQuery);
         if (!userCheckResult.isEmpty()) {
@@ -411,8 +410,17 @@ public class AirlineManagement {
       try {
         System.out.print("\tEnter username: ");
         String username = in.readLine();
+        if (username == null || username.trim().isEmpty()) {
+            System.out.println("Username cannot be empty, Please try again and enter a valid username.");
+            return;
+        }
+
         System.out.print("\tEnter password: ");
         String password = in.readLine();
+        if (password == null || password.trim().isEmpty()) {
+            System.out.println("Password cannot be empty, Please try again and enter a valid password.");
+            return;
+        }
 
         String query = String.format("SELECT role FROM Users WHERE username = '%s' AND password = '%s';", username, password);
         List<List<String>> results = esql.executeQueryAndReturnResult(query);
