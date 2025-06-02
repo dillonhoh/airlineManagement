@@ -412,14 +412,14 @@ public class AirlineManagement {
         String username = in.readLine();
         if (username == null || username.trim().isEmpty()) {
             System.out.println("Username cannot be empty, Please try again and enter a valid username.");
-            return;
+            return null;
         }
 
         System.out.print("\tEnter password: ");
         String password = in.readLine();
         if (password == null || password.trim().isEmpty()) {
             System.out.println("Password cannot be empty, Please try again and enter a valid password.");
-            return;
+            return null;
         }
 
         String query = String.format("SELECT role FROM Users WHERE username = '%s' AND password = '%s';", username, password);
@@ -442,7 +442,17 @@ public class AirlineManagement {
 
    public static void feature1(AirlineManagement esql) {
       // View Flights
+      try{
+         String query = "SELECT * FROM Flight;";
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+      } catch (SQLException e) {
+         System.err.println("Error in feature1: " + e.getMessage());
+      }
    }
+
    public static void feature2(AirlineManagement esql) {
       // View Flight Seats
    }
