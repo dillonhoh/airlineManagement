@@ -383,7 +383,7 @@ public class AirlineManagement {
     * Check log in credentials for an existing user
     * @return User login or null is the user does not exist
     **/
-public static String LogIn(AirlineManagement esql){
+   public static String LogIn(AirlineManagement esql){
       try {
         System.out.print("\tEnter username: ");
         String username = in.readLine();
@@ -404,7 +404,7 @@ public static String LogIn(AirlineManagement esql){
         System.err.println("Error in LogIn: " + e.getMessage());
         return null;
     }
-   }
+   }//end
 
 // Rest of the functions definition go in here
 
