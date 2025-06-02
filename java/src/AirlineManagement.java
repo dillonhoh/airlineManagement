@@ -485,7 +485,19 @@ public class AirlineManagement {
    public static void feature6(AirlineManagement esql) {
       //
    }
-  
+
+   public static void feature11(AirlineManagement esql) {
+      try{
+         System.out.print("Enter destination: ");
+         String destination = in.readLine();
+
+         System.out.print("Enter departure city: ");
+         String departureCity = in.readLine();
+
+         String query = 
+      }
+
+   }
 
 
 }//end AirlineManagement
