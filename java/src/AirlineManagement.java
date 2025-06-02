@@ -443,13 +443,30 @@ public class AirlineManagement {
    public static void feature1(AirlineManagement esql) {
       // View Flights
       try{
-         String query = "SELECT * FROM Flight;";
+         System.out.print("Enter flight number: ");
+         String flightNum = in.readLine();
+
+         String query = "SELECT DayOfWeek, DepartureTime, ArrivalTime " +
+                   "FROM Schedule " +
+                   "WHERE flightNumber = '" + flightNum + "' " +
+                   "ORDER BY CASE " +
+                   "  WHEN DayOfWeek = 'Monday' THEN 1 " +
+                   "  WHEN DayOfWeek = 'Tuesday' THEN 2 " +
+                   "  WHEN DayOfWeek = 'Wednesday' THEN 3 " +
+                   "  WHEN DayOfWeek = 'Thursday' THEN 4 " +
+                   "  WHEN DayOfWeek = 'Friday' THEN 5 " +
+                   "  WHEN DayOfWeek = 'Saturday' THEN 6 " +
+                   "  WHEN DayOfWeek = 'Sunday' THEN 7 " +
+                   "END";
+
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
             System.out.println("No flights available.");
          }
-      } catch (SQLException e) {
+         return;
+      } catch (Exception e) {
          System.err.println("Error in feature1: " + e.getMessage());
+         return;
       }
    }
 
