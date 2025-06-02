@@ -444,19 +444,19 @@ public class AirlineManagement {
       // View Flights
       try{
          System.out.print("Enter flight number: ");
-         String flightNum = in.readLine();
+         String flightNumInput = in.readLine();
 
          String query = "SELECT DayOfWeek, DepartureTime, ArrivalTime " +
                    "FROM Schedule " +
-                   "WHERE flightNumber = '" + flightNum + "' " +
+                   "WHERE flightNumber = '" + flightNumInput + "' " +
                    "ORDER BY CASE " +
-                   "  WHEN DayOfWeek = 'Monday' THEN 1 " +
-                   "  WHEN DayOfWeek = 'Tuesday' THEN 2 " +
-                   "  WHEN DayOfWeek = 'Wednesday' THEN 3 " +
-                   "  WHEN DayOfWeek = 'Thursday' THEN 4 " +
-                   "  WHEN DayOfWeek = 'Friday' THEN 5 " +
-                   "  WHEN DayOfWeek = 'Saturday' THEN 6 " +
-                   "  WHEN DayOfWeek = 'Sunday' THEN 7 " +
+                   "WHEN DayOfWeek = 'Monday' THEN 1" +
+                   "WHEN DayOfWeek = 'Tuesday' THEN 2" +
+                   "WHEN DayOfWeek = 'Wednesday' THEN 3" +
+                   "WHEN DayOfWeek = 'Thursday' THEN 4" +
+                   "WHEN DayOfWeek = 'Friday' THEN 5" +
+                   "WHEN DayOfWeek = 'Saturday' THEN 6" +
+                   "WHEN DayOfWeek = 'Sunday' THEN 7" +
                    "END";
 
          int rowCount = esql.executeQueryAndPrintResult(query);
@@ -472,6 +472,26 @@ public class AirlineManagement {
 
    public static void feature2(AirlineManagement esql) {
       // View Flight Seats
+      try{
+         System.out.print("Enter flight number: ");
+         String flightNumInput = in.readLine();
+         System.out.print("Enter a date: ");
+         String dateInput = in.readLine();
+
+         String query = "SELECT SeatsTotal - SeatsSold AS seats_available, SeatsSold AS seats_sold " + 
+                        "FROM FlightInstance " +
+                        "WHERE FlightNumber = '" + flightNumInput + "' " +
+                        "AND FlightDate = '" + dateInput + "' ";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature1: " + e.getMessage());
+         return;
+      }
    }
    public static void feature3(AirlineManagement esql) {
       // View Flight Status
