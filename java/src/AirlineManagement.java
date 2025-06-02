@@ -369,16 +369,31 @@ public class AirlineManagement {
       try {
         System.out.print("\tEnter username: ");
         String username = in.readLine();
+        if (username == null || username.trim().isEmpty()) {
+            System.out.println("Username cannot be empty, Please try again and enter a valid username.");
+            return;
+        }
+
+        String checkUserQuery = String.format("SELECT * FROM Users WHERE username = '%s';", username);
+        List<List<String>> userCheckResult = esql.executeQueryAndReturnResult(checkUserQuery);
+        if (!userCheckResult.isEmpty()) {
+            System.out.println("Username already exists. Please try again with a different username.");
+            return;
+        }
+
         System.out.print("\tEnter password: ");
         String password = in.readLine();
+        if (password == null || password.trim().isEmpty()) {
+            System.out.println("Password cannot be empty, Please try again and enter a valid password.");
+            return;
+        }
+
         System.out.print("\tEnter role: ");
         String role = in.readLine();
-
         if (!role.equals("Customer") && !role.equals("Manager") && !role.equals("Pilot") && !role.equals("Technician")) {
-         System.out.println("Invalid role! Please enter a valid role.");
+         System.out.println("Invalid role! Please try again and enter a valid role.");
             return;
          }
-
         String query = String.format("INSERT INTO Users (username, password, role) VALUES ('%s','%s','%s');", username, password, role);
         esql.executeUpdate(query);
         System.out.println("User successfully created!");
