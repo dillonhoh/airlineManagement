@@ -283,6 +283,9 @@ public class AirlineManagement {
                 System.out.println("5. View Full Order ID History");
                 System.out.println(".........................");
                 System.out.println(".........................");
+                System.out.println(".........................");
+                System.out.println(".........................");
+                System.out.println(".........................");
                }
                else if(userRole.equals("Customer")){
                 //**the following functionalities should only be able to be used by customers**
@@ -489,12 +492,42 @@ public class AirlineManagement {
          }
          return;
       } catch (Exception e) {
-         System.err.println("Error in feature1: " + e.getMessage());
+         System.err.println("Error in feature2: " + e.getMessage());
          return;
       }
    }
    public static void feature3(AirlineManagement esql) {
       // View Flight Status
+      try{
+         System.out.print("Enter flight number: ");
+         String flightNumInput = in.readLine();
+         System.out.print("Enter a date: ");
+         String dateInput = in.readLine();
+
+         String query = "SELECT FlightNumber, FlightDate, " +
+                     "CASE " +
+                        "WHEN DepartedOnTime THEN 'Yes' " +
+                        "WHEN NOT DepartedOnTime THEN 'No' " +
+                        "ELSE 'Unknown' " +
+                     "END AS DepartedOnTime, " +
+                     "CASE " +
+                        "WHEN ArrivedOnTime THEN 'Yes' " +
+                        "WHEN NOT ArrivedOnTime THEN 'No' " +
+                        "ELSE 'Unknown' " +
+                     "END AS ArrivedOnTime " +
+                     "FROM FlightInstance " +
+                     "WHERE FlightNumber = '" + flightNumInput + "' " +
+                     "AND FlightDate = '" + dateInput + "'";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature3: " + e.getMessage());
+         return;
+      }
    }
    public static void feature4(AirlineManagement esql) {
       // View Flights of the day
