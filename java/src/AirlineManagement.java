@@ -313,6 +313,10 @@ public class AirlineManagement {
                    case 4: feature4(esql); break;
                    case 5: feature5(esql); break;
                    case 6: feature6(esql); break;
+                   case 7: feature1(esql); break;
+                   case 8: feature2(esql); break;
+                   case 9: feature3(esql); break;
+                   case 10: feature4(esql); break;
                    case 11: feature11(esql); break;
                    case 12: feature12(esql); break;
                    case 13: feature13(esql); break;
@@ -552,15 +556,54 @@ public class AirlineManagement {
          }
          return;
       } catch (Exception e) {
-         System.err.println("Error in feature3: " + e.getMessage());
+         System.err.println("Error in feature4: " + e.getMessage());
          return;
       }
    }
    public static void feature5(AirlineManagement esql) {
       // View Full Order ID History
+      try{
+         System.out.print("Enter flight number: ");
+         String flightNumInput = in.readLine();
+         System.out.print("Enter a date: ");
+         String dateInput = in.readLine();
+
+         String query = "SELECT FirstName, LastName, Status " +
+                        "FROM Customer c JOIN Reservation r on c.CustomerID = r.CustomerID " +
+                        "JOIN FlightInstance fi ON fi.FlightInstanceID = r.FlightInstanceID " +
+                        "WHERE fi.FlightNumber = '" + flightNumInput + "' " +
+                        "AND fi.FlightDate = '" + dateInput + "' ";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature5: " + e.getMessage());
+         return;
+      }
    }
    public static void feature6(AirlineManagement esql) {
       //
+      try{
+         System.out.print("Enter a Reservation Number: ");
+         String reservationNumInput = in.readLine();
+         
+
+         String query = "SELECT FirstName, LastName, Gender, DOB, Address, Phone, Zip " + 
+                        "FROM Customer c JOIN Reservation r on c.CustomerID = r.CustomerID " + 
+                        "WHERE r.ReservationID = '" + reservationNumInput + "'";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature6: " + e.getMessage());
+         return;
+      }
    }
 
    public static void feature11(AirlineManagement esql) {
