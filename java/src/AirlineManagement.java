@@ -532,6 +532,25 @@ public class AirlineManagement {
    }
    public static void feature4(AirlineManagement esql) {
       // View Flights of the day
+      try{
+         System.out.print("Enter a date: ");
+         String dateInput = in.readLine();
+
+         String query = "SELECT fi.FlightNumber, f.DepartureCity, f.ArrivalCity, s.DepartureTime, s.ArrivalTime " +
+                     "FROM FlightInstance fi JOIN Schedule s ON fi.FlightNumber = s.FlightNumber " +
+                     "JOIN Flight f ON fi.FlightNumber = f.FlightNumber " +
+                     "WHERE fi.FlightDate = '" + dateInput + "'" +
+                     "AND TRIM(TO_CHAR(fi.FlightDate, 'Day')) = s.DayOfWeek";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature3: " + e.getMessage());
+         return;
+      }
    }
    public static void feature5(AirlineManagement esql) {
       // View Full Order ID History
