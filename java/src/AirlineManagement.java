@@ -290,8 +290,9 @@ public class AirlineManagement {
                else if(userRole.equals("Customer")){
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
-                System.out.println(".........................");
-                System.out.println(".........................");
+                System.out.println("12. Find Ticket Cost");
+                System.out.println("13. Find Airplane Type");
+                System.out.println("14. Make a Reservation for a Flight");
                }
                else if(userRole.equals("Pilot")){
                 //**the following functionalities should ony be able to be used by Pilots**
@@ -317,6 +318,9 @@ public class AirlineManagement {
                    case 9: feature3(esql); break;
                    case 10: feature4(esql); break;
                    case 11: feature11(esql); break;
+                   case 12: feature12(esql); break;
+                   case 13: feature13(esql); break;
+                   case 14: feature14(esql); break;
 
 
 
@@ -378,20 +382,20 @@ public class AirlineManagement {
         System.out.print("\tEnter username: ");
         String username = in.readLine();
         if (username == null || username.trim().isEmpty()) {
-            System.out.println("Username cannot be empty, Please try again and enter a valid username.");
+            System.out.println("Username cannot be empty, please try again and enter a valid username.");
             return;
         }
         String checkUserQuery = String.format("SELECT * FROM Users WHERE username = '%s';", username);
         List<List<String>> userCheckResult = esql.executeQueryAndReturnResult(checkUserQuery);
         if (!userCheckResult.isEmpty()) {
-            System.out.println("Username already exists. Please try again with a different username.");
+            System.out.println("Username already exists. please try again with a different username.");
             return;
         }
 
         System.out.print("\tEnter password: ");
         String password = in.readLine();
         if (password == null || password.trim().isEmpty()) {
-            System.out.println("Password cannot be empty, Please try again and enter a valid password.");
+            System.out.println("Password cannot be empty, please try again and enter a valid password.");
             return;
         }
 
@@ -419,14 +423,14 @@ public class AirlineManagement {
         System.out.print("\tEnter username: ");
         String username = in.readLine();
         if (username == null || username.trim().isEmpty()) {
-            System.out.println("Username cannot be empty, Please try again and enter a valid username.");
+            System.out.println("Username cannot be empty, please try again and enter a valid username.");
             return null;
         }
 
         System.out.print("\tEnter password: ");
         String password = in.readLine();
         if (password == null || password.trim().isEmpty()) {
-            System.out.println("Password cannot be empty, Please try again and enter a valid password.");
+            System.out.println("Password cannot be empty, please try again and enter a valid password.");
             return null;
         }
 
@@ -606,9 +610,17 @@ public class AirlineManagement {
       try{
          System.out.print("Enter depature city: ");
          String departureCity = in.readLine();
+         if (departureCity == null || departureCity.trim().isEmpty()) {
+            System.out.println("Departure city cannot be empty, please try again and enter a valid departure city.");
+            return;
+        }
 
          System.out.print("Enter destination: ");
          String destination = in.readLine();
+         if (destination == null || destination.trim().isEmpty()) {
+            System.out.println("Destination cannot be empty, please try again and enter a valid destination.");
+            return;
+        }
 
          String query = "SELECT DepartureTime AS departure_time, ArrivalTime AS arrival_time, fi.NumOfStops AS num_stops, ROUND(100.0 * SUM(CASE WHEN fi2.DepartedOnTime AND fi2.ArrivedOnTime THEN 1 ELSE 0 END) / COUNT(fi2.FlightInstanceID), 2) AS On_Time_Record_as_percent " +
                         "FROM Flight f " + 
@@ -627,5 +639,58 @@ public class AirlineManagement {
          return;
       }
    }
+
+   public static void feature12(AirlineManagement esql) {
+      try{
+         System.out.print("Enter a flight number: ");
+         String flightNumber = in.readLine();
+         if (flightNumber == null || flightNumber.trim().isEmpty()) {
+            System.out.println("Flight number cannot be empty, please try again and enter a valid flight number.");
+            return;
+      }
+         String query = "SELECT TicketCost AS ticket_costs_for_flight "+
+                        "FROM FlightInstance fi" + 
+                        "WHERE fi.FlightNumber = '" + flightNumber + "'";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No tickets available for this flight.");
+         }
+         return;
+   } catch (Exception e) {
+      System.err.println("Error in feature12: " + e.getMessage());
+         return;
+      }
+   }
+
+      public static void feature13(AirlineManagement esql) {
+      try{
+         System.out.print("Enter a flight number: ");
+         String flightNumber = in.readLine();
+         if (flightNumber == null || flightNumber.trim().isEmpty()) {
+            System.out.println("Flight number cannot be empty, please try again and enter a valid flight number.");
+            return;
+      }
+         String query = "SELECT Make AS plane_make, Model as plane_model "+
+                        "FROM Flight f " + 
+                        "JOIN Plane p ON f.PlaneID = p.PlaneID " +
+                        "WHERE FlightNumber = '" + flightNumber + "'";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("Flight number does not exist or no plane associated with this flight.");
+         }
+         return;
+   } catch (Exception e) {
+      System.err.println("Error in feature13: " + e.getMessage());
+         return;
+      }
+      }
+      
+      public static void feature14(AirlineManagement esql) {
+         try{
+            
+         }
+      }
 }//end AirlineManagement
 
