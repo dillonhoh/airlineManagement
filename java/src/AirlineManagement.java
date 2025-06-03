@@ -312,6 +312,10 @@ public class AirlineManagement {
                    case 4: feature4(esql); break;
                    case 5: feature5(esql); break;
                    case 6: feature6(esql); break;
+                   case 7: feature1(esql); break;
+                   case 8: feature2(esql); break;
+                   case 9: feature3(esql); break;
+                   case 10: feature4(esql); break;
                    case 11: feature11(esql); break;
 
 
@@ -578,6 +582,24 @@ public class AirlineManagement {
    }
    public static void feature6(AirlineManagement esql) {
       //
+      try{
+         System.out.print("Enter a Reservation Number: ");
+         String reservationNumInput = in.readLine();
+         
+
+         String query = "SELECT FirstName, LastName, Gender, DOB, Address, Phone, Zip " + 
+                        "FROM Customer c JOIN Reservation r on c.CustomerID = r.CustomerID " + 
+                        "WHERE r.ReservationID = '" + reservationNumInput + "'";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature6: " + e.getMessage());
+         return;
+      }
    }
 
    public static void feature11(AirlineManagement esql) {
