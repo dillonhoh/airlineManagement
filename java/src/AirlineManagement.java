@@ -548,12 +548,33 @@ public class AirlineManagement {
          }
          return;
       } catch (Exception e) {
-         System.err.println("Error in feature3: " + e.getMessage());
+         System.err.println("Error in feature4: " + e.getMessage());
          return;
       }
    }
    public static void feature5(AirlineManagement esql) {
       // View Full Order ID History
+      try{
+         System.out.print("Enter flight number: ");
+         String flightNumInput = in.readLine();
+         System.out.print("Enter a date: ");
+         String dateInput = in.readLine();
+
+         String query = "SELECT FirstName, LastName, Status " +
+                        "FROM Customer c JOIN Reservation r on c.CustomerID = r.CustomerID " +
+                        "JOIN FlightInstance fi ON fi.FlightInstanceID = r.FlightInstanceID " +
+                        "WHERE fi.FlightNumber = '" + flightNumInput + "' " +
+                        "AND fi.FlightDate = '" + dateInput + "' ";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature5: " + e.getMessage());
+         return;
+      }
    }
    public static void feature6(AirlineManagement esql) {
       //
