@@ -689,7 +689,21 @@ public class AirlineManagement {
       
       public static void feature14(AirlineManagement esql) {
          try{
-            
+            System.out.print("Enter Customer ID: ");
+            String customerID = in.readLine();
+            if (customerID == null || customerID.trim().isEmpty()) {
+               System.out.println("Customer ID cannot be empty, please try again and enter a valid flight number.");
+               return;
+            }
+
+            System.out.print("Enter Flight Instance ID: ");
+            String flightInstanceID = in.readLine();
+            if (flightInstanceID == null || flightInstanceID.trim().isEmpty()) {
+               System.out.println("Customer ID cannot be empty, please try again and enter a valid flight number.");
+               return;
+            }
+
+
          }
       }
 }//end AirlineManagement
