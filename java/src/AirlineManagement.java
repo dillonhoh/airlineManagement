@@ -286,7 +286,7 @@ public class AirlineManagement {
                }
                else if(userRole.equals("Customer")){
                 //**the following functionalities should only be able to be used by customers**
-                System.out.println("10. Search Flights");
+                System.out.println("11. Search Flights");
                 System.out.println(".........................");
                 System.out.println(".........................");
                }
@@ -309,6 +309,7 @@ public class AirlineManagement {
                    case 4: feature4(esql); break;
                    case 5: feature5(esql); break;
                    case 6: feature6(esql); break;
+                   case 11: feature11(esql); break;
 
 
 
@@ -508,17 +509,28 @@ public class AirlineManagement {
 
    public static void feature11(AirlineManagement esql) {
       try{
+         System.out.print("Enter depature city: ");
+         String departureCity = in.readLine();
+
          System.out.print("Enter destination: ");
          String destination = in.readLine();
 
-         System.out.print("Enter departure city: ");
-         String departureCity = in.readLine();
-
-         String query = 
+         String query = "SELECT DepartureTime AS departure_time, ArrivalTime AS arrival_time, fi.NumOfStops AS num_stops, ROUND(100.0 * SUM(CASE WHEN fi2.DepartedOnTime AND fi2.ArrivedOnTime THEN 1 ELSE 0 END) / COUNT(fi2.FlightInstanceID), 2) AS On_Time_Record_as_percent " +
+                        "FROM Flight f " + 
+                        "JOIN Schedule s ON f.FlightNumber = s.FlightNumber " + 
+                        "JOIN FlightInstance fi ON f.FlightNumber = fi.FlightNumber " + 
+                        "JOIN FlightInstance fi2 ON f.FlightNumber = fi2.FlightNumber " +
+                        "WHERE f.ArrivalCity ILIKE '" + destination + "'AND f.DepartureCity ILIKE '" + departureCity + "' " +
+                        "GROUP BY f.FlightNumber, s.DepartureTime, s.ArrivalTime, fi.NumOfStops";
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+      System.err.println("Error in feature11: " + e.getMessage());
+         return;
       }
-
    }
-
-
 }//end AirlineManagement
 
