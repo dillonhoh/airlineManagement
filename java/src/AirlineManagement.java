@@ -298,7 +298,7 @@ public class AirlineManagement {
                 //**the following functionalities should ony be able to be used by Pilots**
                 System.out.println("15. Check a Plane's Maintenances");
                 System.out.println("16. Check a Pilot's Maintenance Requests");
-                System.out.println(".........................");
+                System.out.println("17. Log a Repair");
                }
                else if(userRole.equals("Pilot")){
                //**the following functionalities should ony be able to be used by Technicians**
@@ -323,6 +323,7 @@ public class AirlineManagement {
                    case 14: feature14(esql); break;
                    case 15: feature15(esql); break;
                    case 16: feature16(esql); break;
+                   case 17: feature17(esql); break;
 
 
 
@@ -666,127 +667,193 @@ public class AirlineManagement {
       }
    }
 
-      public static void feature13(AirlineManagement esql) {
+   public static void feature13(AirlineManagement esql) {
+   try{
+      System.out.print("Enter a flight number: ");
+      String flightNumber = in.readLine();
+      if (flightNumber == null || flightNumber.trim().isEmpty()) {
+         System.out.println("Flight number cannot be empty, please try again and enter a valid flight number.");
+         return;
+   }
+      String query = "SELECT Make AS plane_make, Model as plane_model "+
+                     "FROM Flight f " + 
+                     "JOIN Plane p ON f.PlaneID = p.PlaneID " +
+                     "WHERE FlightNumber = '" + flightNumber + "'";
+
+      int rowCount = esql.executeQueryAndPrintResult(query);
+      if (rowCount == 0) {
+         System.out.println("Flight number does not exist or no plane associated with this flight.");
+      }
+      return;
+      } catch (Exception e) {
+         System.err.println("Error in feature13: " + e.getMessage());
+         return;
+      }
+   }
+   
+   public static void feature14(AirlineManagement esql) {
       try{
-         System.out.print("Enter a flight number: ");
-         String flightNumber = in.readLine();
-         if (flightNumber == null || flightNumber.trim().isEmpty()) {
-            System.out.println("Flight number cannot be empty, please try again and enter a valid flight number.");
+         System.out.print("Enter Customer ID: ");
+         String customerID = in.readLine();
+         if (customerID == null || customerID.trim().isEmpty()) {
+            System.out.println("Customer ID cannot be empty, please try again and enter a valid flight number.");
             return;
-      }
-         String query = "SELECT Make AS plane_make, Model as plane_model "+
-                        "FROM Flight f " + 
-                        "JOIN Plane p ON f.PlaneID = p.PlaneID " +
-                        "WHERE FlightNumber = '" + flightNumber + "'";
-
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
-            System.out.println("Flight number does not exist or no plane associated with this flight.");
          }
-         return;
-   } catch (Exception e) {
-      System.err.println("Error in feature13: " + e.getMessage());
-         return;
-      }
-      }
-      
-      public static void feature14(AirlineManagement esql) {
-         try{
-            System.out.print("Enter Customer ID: ");
-            String customerID = in.readLine();
-            if (customerID == null || customerID.trim().isEmpty()) {
-               System.out.println("Customer ID cannot be empty, please try again and enter a valid flight number.");
-               return;
-            }
 
-            System.out.print("Enter Flight Instance ID: ");
-            String flightInstanceID = in.readLine();
-            if (flightInstanceID == null || flightInstanceID.trim().isEmpty()) {
-               System.out.println("Customer ID cannot be empty, please try again and enter a valid flight number.");
-               return;
-            }
-         } catch (Exception e) {
-         System.err.println("Error in feature14: " + e.getMessage());
+         System.out.print("Enter Flight Instance ID: ");
+         String flightInstanceID = in.readLine();
+         if (flightInstanceID == null || flightInstanceID.trim().isEmpty()) {
+            System.out.println("Customer ID cannot be empty, please try again and enter a valid flight number.");
+            return;
+         }
+      } catch (Exception e) {
+      System.err.println("Error in feature14: " + e.getMessage());
+      return;
+      }
+   }
+
+   public static void feature15(AirlineManagement esql) {
+   try{
+      System.out.print("Enter a Plane ID: ");
+      String planeID = in.readLine();
+         if (planeID == null || planeID.trim().isEmpty()) {
+         System.out.println("Plane ID cannot be empty, please try again and enter a valid plane ID.");
          return;
       }
+
+      System.out.print("Enter a start date (YYYY-MM-DD): ");
+      String dateRangeStart = in.readLine();
+         if (dateRangeStart == null || dateRangeStart.trim().isEmpty()) {
+         System.out.println("Start date cannot be empty, please try again and enter a valid start range.");
+         return;
       }
 
-      public static void feature15(AirlineManagement esql) {
-      try{
-         System.out.print("Enter a Plane ID: ");
-         String planeID = in.readLine();
-            if (planeID == null || planeID.trim().isEmpty()) {
-            System.out.println("Plane ID cannot be empty, please try again and enter a valid plane ID.");
-            return;
-         }
-
-         System.out.print("Enter a start date (YYYY-MM-DD): ");
-         String dateRangeStart = in.readLine();
-            if (dateRangeStart == null || dateRangeStart.trim().isEmpty()) {
-            System.out.println("Start date cannot be empty, please try again and enter a valid start range.");
-            return;
-         }
-
-         if (!dateRangeStart.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
-            return;
-         }
-
-         System.out.print("Enter an end date (YYYY-MM-DD): ");
-         String dateRangeEnd = in.readLine();
-         if (dateRangeEnd == null || dateRangeEnd.trim().isEmpty()) {
-            System.out.println("End date cannot be empty, please try again and enter a valid end range.");
-            return;
-         }
-
-         if (!dateRangeEnd.matches("\\d{4}-\\d{2}-\\d{2}")) {
-            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
-            return;
-         }
-
-         String query = "SELECT mr.RepairCode AS repair_code, mr.RequestDate AS request_date " +
-                        "FROM MaintenanceRequest mr " +
-                        "WHERE mr.PlaneID = '" + planeID + "' " +
-                        "AND mr.RequestDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' " +
-                        "ORDER BY mr.RequestDate";
-
-
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
-            System.out.println("No maintenances were made for this date range/plane.");
-         }
+      if (!dateRangeStart.matches("\\d{4}-\\d{2}-\\d{2}")) {
+         System.out.println("Invalid date format. Please use YYYY-MM-DD.");
          return;
-   } catch (Exception e) {
+      }
+
+      System.out.print("Enter an end date (YYYY-MM-DD): ");
+      String dateRangeEnd = in.readLine();
+      if (dateRangeEnd == null || dateRangeEnd.trim().isEmpty()) {
+         System.out.println("End date cannot be empty, please try again and enter a valid end range.");
+         return;
+      }
+
+      if (!dateRangeEnd.matches("\\d{4}-\\d{2}-\\d{2}")) {
+         System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+         return;
+      }
+
+      String query = "SELECT mr.RepairCode AS repair_code, mr.RequestDate AS request_date " +
+                     "FROM MaintenanceRequest mr " +
+                     "WHERE mr.PlaneID = '" + planeID + "' " +
+                     "AND mr.RequestDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' " +
+                     "ORDER BY mr.RequestDate";
+
+
+      int rowCount = esql.executeQueryAndPrintResult(query);
+      if (rowCount == 0) {
+         System.out.println("No maintenances were made for this date range/plane.");
+      }
+      return;
+      } catch (Exception e) {
       System.err.println("Error in feature15: " + e.getMessage());
-         return;
+      return;
       }
-      }
+   }
 
-      public static void feature16(AirlineManagement esql) {
-              try{
+   public static void feature16(AirlineManagement esql) {
+      try{
          System.out.print("Enter a Pilot ID: ");
          String pilotID = in.readLine();
-            if (pilotID == null || pilotID.trim().isEmpty()) {
+         if (pilotID == null || pilotID.trim().isEmpty()) {
             System.out.println("Pilot ID cannot be empty, please try again and enter a valid pilot ID.");
             return;
          }
 
          String query = "SELECT p.Name AS pilot_name, mr.RequestID, mr.PlaneID, mr.RepairCode, mr.RequestDate " +
-                        "FROM MaintenanceRequest mr " +
-                        "JOIN Pilot p ON mr.PilotID = p.PilotID " +
-                        "WHERE mr.PilotID = '" + pilotID + "' " +
-                        "ORDER BY mr.RequestDate;";
+                     "FROM MaintenanceRequest mr " +
+                     "JOIN Pilot p ON mr.PilotID = p.PilotID " +
+                     "WHERE mr.PilotID = '" + pilotID + "' " +
+                     "ORDER BY mr.RequestDate;";
 
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
             System.out.println("Pilot did not make any maintenance requests.");
          }
-         return;
+      return;
    } catch (Exception e) {
-      System.err.println("Error in feature16: " + e.getMessage());
+   System.err.println("Error in feature16: " + e.getMessage());
+      return;
+      }
+   }
+
+   public static void feature17(AirlineManagement esql) {
+      try{
+         System.out.print("Enter Plane ID: ");
+         String planeID = in.readLine();
+         if (planeID == null || planeID.trim().isEmpty()) {
+            System.out.println("Plane ID cannot be empty, please try again and enter a valid plane ID.");
+            return;
+         }
+         String checkPlane = "SELECT 1 FROM Plane WHERE PlaneID = '" + planeID + "';";
+         if (esql.executeQuery(checkPlane) == 0) {
+            System.out.println("Error: Plane ID does not exist in the database.");
+            return;
+         }
+
+         System.out.print("Enter Repair Code: ");
+         String repairCode = in.readLine();
+         if (repairCode == null || repairCode.trim().isEmpty()) {
+            System.out.println("Repair Code cannot be empty, please try again and enter a valid repair code.");
+            return;
+         }
+
+         System.out.print("Enter Repair Date (YYYY-MM-DD): ");
+         String repairDate = in.readLine();
+         if (repairDate == null || repairDate.trim().isEmpty()) {
+            System.out.println("Repair Date cannot be empty, please try again and enter a valid repair date.");
+            return;
+         }
+         if (!repairDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+            return;
+         }
+
+         System.out.print("Enter Technician ID: ");
+         String techID = in.readLine();
+         if (techID == null || techID.trim().isEmpty()) {
+            System.out.println("Technician ID cannot be empty.");
+            return;
+         }
+         String checkTech = "SELECT 1 FROM Technician WHERE TechnicianID = '" + techID + "';";
+         if (esql.executeQuery(checkTech) == 0) {
+            System.out.println("Error: Technician ID does not exist in the database.");
+            return;
+         }
+
+
+         String latestRepair = "SELECT MAX(RepairID) FROM Repair;";
+         List<List<String>> result = esql.executeQueryAndReturnResult(latestRepair);
+
+         int nextRepairID = 1; 
+         if (result != null && !result.isEmpty() && result.get(0).get(0) != null) {
+            nextRepairID = Integer.parseInt(result.get(0).get(0)) + 1;
+      }
+
+         String query = "INSERT INTO Repair (RepairID, PlaneID, RepairCode, RepairDate, TechnicianID) " +
+                           "VALUES (" + nextRepairID + ", '" + planeID + "', '" + repairCode + "', DATE '" + repairDate + "', '" + techID + "');";
+         esql.executeUpdate(query);
+         System.out.println("Repair successfully logged with RepairID: " + nextRepairID);
+
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature17: " + e.getMessage());
          return;
       }
-      }
+   }
+
 }//end AirlineManagement
 
