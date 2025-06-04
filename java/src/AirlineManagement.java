@@ -297,7 +297,7 @@ public class AirlineManagement {
                else if(userRole.equals("Technician")){
                 //**the following functionalities should ony be able to be used by Pilots**
                 System.out.println("15. Check a Plane's Maintenances");
-                System.out.println(".........................");
+                System.out.println("16. Check a Pilot's Maintenance Requests");
                 System.out.println(".........................");
                }
                else if(userRole.equals("Pilot")){
@@ -322,6 +322,7 @@ public class AirlineManagement {
                    case 13: feature13(esql); break;
                    case 14: feature14(esql); break;
                    case 15: feature15(esql); break;
+                   case 16: feature16(esql); break;
 
 
 
@@ -725,7 +726,7 @@ public class AirlineManagement {
             System.out.println("Start date cannot be empty, please try again and enter a valid start range.");
             return;
          }
-         // Validate date format (YYYY-MM-DD)
+
          if (!dateRangeStart.matches("\\d{4}-\\d{2}-\\d{2}")) {
             System.out.println("Invalid date format. Please use YYYY-MM-DD.");
             return;
@@ -737,17 +738,17 @@ public class AirlineManagement {
             System.out.println("End date cannot be empty, please try again and enter a valid end range.");
             return;
          }
-         // Validate date format (YYYY-MM-DD)
+
          if (!dateRangeEnd.matches("\\d{4}-\\d{2}-\\d{2}")) {
             System.out.println("Invalid date format. Please use YYYY-MM-DD.");
             return;
          }
 
-         String query = "SELECT MR.RepairCode AS repair_code, MR.RequestDate AS request_date " +
-                        "FROM MaintenanceRequest MR " +
-                        "WHERE MR.PlaneID = '" + planeID + "' " +
-                        "AND MR.RequestDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' " +
-                        "ORDER BY MR.RequestDate;";
+         String query = "SELECT mr.RepairCode AS repair_code, mr.RequestDate AS request_date " +
+                        "FROM MaintenanceRequest mr " +
+                        "WHERE mr.PlaneID = '" + planeID + "' " +
+                        "AND mr.RequestDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' " +
+                        "ORDER BY mr.RequestDate";
 
 
          int rowCount = esql.executeQueryAndPrintResult(query);
@@ -757,6 +758,33 @@ public class AirlineManagement {
          return;
    } catch (Exception e) {
       System.err.println("Error in feature15: " + e.getMessage());
+         return;
+      }
+      }
+
+      public static void feature16(AirlineManagement esql) {
+              try{
+         System.out.print("Enter a Pilot ID: ");
+         String pilotID = in.readLine();
+            if (pilotID == null || pilotID.trim().isEmpty()) {
+            System.out.println("Pilot ID cannot be empty, please try again and enter a valid pilot ID.");
+            return;
+         }
+
+         String query = "SELECT p.Name AS pilot_name, mr.RequestID, mr.PlaneID, mr.RepairCode, mr.RequestDate " +
+                        "FROM MaintenanceRequest mr " +
+                        "JOIN Pilot p ON mr.PilotID = p.PilotID " +
+                        "WHERE mr.PilotID = '" + pilotID + "' " +
+                        "ORDER BY mr.RequestDate;";
+
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("Pilot did not make any maintenance requests.");
+         }
+         return;
+   } catch (Exception e) {
+      System.err.println("Error in feature16: " + e.getMessage());
          return;
       }
       }
