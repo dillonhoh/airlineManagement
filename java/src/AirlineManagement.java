@@ -276,16 +276,16 @@ public class AirlineManagement {
                 System.out.println("---------");
                if(userRole.equals("Manager")){
                 //**the following functionalities should only be able to be used by Management**
-                System.out.println("1. View Flights");
+                System.out.println("1. View Flight's Week Schedule");
                 System.out.println("2. View Flight Seats");
                 System.out.println("3. View Flight Status");
-                System.out.println("4. View Flights of the day");  
-                System.out.println("5. View Full Order ID History");
-                System.out.println(".........................");
-                System.out.println(".........................");
-                System.out.println(".........................");
-                System.out.println(".........................");
-                System.out.println(".........................");
+                System.out.println("4. View Flights of the Day");  
+                System.out.println("5. View Passengers of a Flight");
+                System.out.println("6. View Traveler Information");
+                System.out.println("7. View Plane Information");
+                System.out.println("8. View Repairs Made");
+                System.out.println("9. View Repairs by Date Range");
+                System.out.println("10. View Flight Statistics by Date Range");
                }
                else if(userRole.equals("Customer")){
                 //**the following functionalities should only be able to be used by customers**
@@ -313,10 +313,10 @@ public class AirlineManagement {
                    case 4: feature4(esql); break;
                    case 5: feature5(esql); break;
                    case 6: feature6(esql); break;
-                   case 7: feature1(esql); break;
-                   case 8: feature2(esql); break;
-                   case 9: feature3(esql); break;
-                   case 10: feature4(esql); break;
+                   case 7: feature7(esql); break;
+                   case 8: feature8(esql); break;
+                   case 9: feature9(esql); break;
+                   case 10: feature10(esql); break;
                    case 11: feature11(esql); break;
                    case 12: feature12(esql); break;
                    case 13: feature13(esql); break;
@@ -604,6 +604,138 @@ public class AirlineManagement {
          return;
       } catch (Exception e) {
          System.err.println("Error in feature6: " + e.getMessage());
+         return;
+      }
+   }
+   public static void feature7(AirlineManagement esql) {
+      //
+      try{
+         System.out.print("Enter a Plane ID: ");
+         String planeIDInput = in.readLine();
+
+         String query = "SELECT Make, Model, EXTRACT(YEAR FROM CURRENT_DATE) - Year AS Age(in years) " + 
+                        "FROM Plane p " + 
+                        "WHERE p.PlaneID = '" + planeIDInput + "'";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature7: " + e.getMessage());
+         return;
+      }
+   }
+   public static void feature8(AirlineManagement esql) {
+      //
+      try{
+         System.out.print("Enter a Technician ID: ");
+         String technicianIDInput = in.readLine();
+
+         String query = "SELECT PlaneID, RepairCode, RepairDate " +
+                        "FROM Repair r join Technician t ON r.TechnicianID = t.TechnicianID " +
+                        "WHERE t.technicianID = '" + technicianIDInput + "'";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature8: " + e.getMessage());
+         return;
+      }
+   }
+   public static void feature9(AirlineManagement esql) {
+      //
+      try{
+         System.out.print("Enter a Plane ID: ");
+         String planeIDInput = in.readLine();
+
+         System.out.print("Enter a start date (YYYY-MM-DD): ");
+         String dateRangeStart = in.readLine();
+            if (dateRangeStart == null || dateRangeStart.trim().isEmpty()) {
+            System.out.println("Start date cannot be empty, please try again and enter a valid start range.");
+            return;
+         }
+
+         if (!dateRangeStart.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+            return;
+         }
+
+         System.out.print("Enter an end date (YYYY-MM-DD): ");
+         String dateRangeEnd = in.readLine();
+         if (dateRangeEnd == null || dateRangeEnd.trim().isEmpty()) {
+            System.out.println("End date cannot be empty, please try again and enter a valid end range.");
+            return;
+         }
+
+         if (!dateRangeEnd.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+            return;
+         }
+
+         String query = "SELECT RepairDate, RepairCode, TechnicianID " +
+                        "FROM Repair r " +
+                        "WHERE r.PlaneID = '" + planeIDInput + "' " +
+                        "AND r.RepairDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' ";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature9: " + e.getMessage());
+         return;
+      }
+   }
+   public static void feature10(AirlineManagement esql) {
+      //
+      try{
+         System.out.print("Enter a Flight Number: ");
+         String flightNumberInput = in.readLine();
+
+         System.out.print("Enter a start date (MM/DD/YY): ");
+         String dateRangeStart = in.readLine();
+            if (dateRangeStart == null || dateRangeStart.trim().isEmpty()) {
+            System.out.println("Start date cannot be empty, please try again and enter a valid start range.");
+            return;
+         }
+
+         if (!dateRangeStart.matches("\\d{1,2}/\\d{1,2}/\\d{2}")) {
+            System.out.println("Invalid date format. Please use MM/DD/YY.");
+            return;
+         }
+
+         System.out.print("Enter an end date (MM/DD/YY): ");
+         String dateRangeEnd = in.readLine();
+         if (dateRangeEnd == null || dateRangeEnd.trim().isEmpty()) {
+            System.out.println("End date cannot be empty, please try again and enter a valid end range.");
+            return;
+         }
+
+         if (!dateRangeEnd.matches("\\d{1,2}/\\d{1,2}/\\d{2}")) {
+            System.out.println("Invalid date format. Please use MM/DD/YY.");
+            return;
+         }
+
+         String query = "SELECT COUNT(*) AS Num_FlightInstances, " +
+               "SUM(SeatsSold) AS Sold_Tickets, " +
+               "SUM(SeatsTotal - SeatsSold) AS Unsold_Tickets " +
+               "FROM FlightInstance " +
+               "WHERE FlightNumber = '" + flightNumberInput + "' " +
+               "AND FlightDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' ";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No flights available.");
+         }
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature10: " + e.getMessage());
          return;
       }
    }
