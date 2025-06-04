@@ -788,5 +788,70 @@ public class AirlineManagement {
          return;
       }
       }
+
+      public static void feature17(AirlineManagement esql) {
+      try{
+         System.out.print("Enter Plane ID: ");
+         String planeID = in.readLine();
+         if (planeID == null || planeID.trim().isEmpty()) {
+            System.out.println("Plane ID cannot be empty, please try again and enter a valid plane ID.");
+            return;
+         }
+         String checkPlane = "SELECT 1 FROM Plane WHERE PlaneID = '" + planeID + "';";
+         if (esql.executeQuery(checkPlane) == 0) {
+            System.out.println("Error: Plane ID does not exist in the database.");
+            return;
+         }
+
+         System.out.print("Enter Repair Code: ");
+         String repairCode = in.readLine();
+         if (repairCode == null || repairCode.trim().isEmpty()) {
+            System.out.println("Repair Code cannot be empty, please try again and enter a valid repair code.");
+            return;
+         }
+
+         System.out.print("Enter Repair Date (YYYY-MM-DD): ");
+         String repairDate = in.readLine();
+         if (repairDate == null || repairDate.trim().isEmpty()) {
+            System.out.println("Repair Date cannot be empty, please try again and enter a valid repair date.");
+            return;
+         }
+         if (!repairDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+            return;
+         }
+
+         System.out.print("Enter Technician ID: ");
+         String techID = in.readLine();
+         if (techID == null || techID.trim().isEmpty()) {
+            System.out.println("Technician ID cannot be empty.");
+            return;
+         }
+         String checkTech = "SELECT 1 FROM Technician WHERE TechnicianID = '" + techID + "';";
+         if (esql.executeQuery(checkTech) == 0) {
+            System.out.println("Error: Technician ID does not exist in the database.");
+            return;
+         }
+
+
+         String latestRepair = "SELECT MAX(RepairID) FROM Repair;";
+         List<List<String>> result = esql.executeQueryAndReturnResult(latestRepair);
+
+         int nextRepairID = 1; 
+         if (result != null && !result.isEmpty() && result.get(0).get(0) != null) {
+            nextRepairID = Integer.parseInt(result.get(0).get(0)) + 1;
+      }
+
+         String query = "INSERT INTO Repair (RepairID, PlaneID, RepairCode, RepairDate, TechnicianID) " +
+                           "VALUES (" + nextRepairID + ", '" + planeID + "', '" + repairCode + "', DATE '" + repairDate + "', '" + techID + "');";
+         esql.executeUpdate(query);
+         System.out.println("Repair successfully logged with RepairID: " + nextRepairID);
+
+         return;
+      } catch (Exception e) {
+         System.err.println("Error in feature17: " + e.getMessage());
+         return;
+      }
+   }
 }//end AirlineManagement
 
