@@ -725,11 +725,21 @@ public class AirlineManagement {
             System.out.println("Start date cannot be empty, please try again and enter a valid start range.");
             return;
          }
+         // Validate date format (YYYY-MM-DD)
+         if (!dateRangeStart.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+            return;
+         }
 
          System.out.print("Enter an end date (YYYY-MM-DD): ");
          String dateRangeEnd = in.readLine();
          if (dateRangeEnd == null || dateRangeEnd.trim().isEmpty()) {
             System.out.println("End date cannot be empty, please try again and enter a valid end range.");
+            return;
+         }
+         // Validate date format (YYYY-MM-DD)
+         if (!dateRangeEnd.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            System.out.println("Invalid date format. Please use YYYY-MM-DD.");
             return;
          }
 
