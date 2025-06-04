@@ -294,13 +294,13 @@ public class AirlineManagement {
                 System.out.println("13. Find Airplane Type");
                 System.out.println("14. Make a Reservation for a Flight");
                }
-               else if(userRole.equals("Pilot")){
+               else if(userRole.equals("Technician")){
                 //**the following functionalities should ony be able to be used by Pilots**
-                System.out.println("15. Maintenace Request");
+                System.out.println("15. Check a Plane's Maintenances");
                 System.out.println(".........................");
                 System.out.println(".........................");
                }
-               else if(userRole.equals("Technician")){
+               else if(userRole.equals("Pilot")){
                //**the following functionalities should ony be able to be used by Technicians**
                 System.out.println(".........................");
                 System.out.println(".........................");
@@ -321,6 +321,7 @@ public class AirlineManagement {
                    case 12: feature12(esql); break;
                    case 13: feature13(esql); break;
                    case 14: feature14(esql); break;
+                   case 15: feature15(esql); break;
 
 
 
@@ -648,9 +649,10 @@ public class AirlineManagement {
             System.out.println("Flight number cannot be empty, please try again and enter a valid flight number.");
             return;
       }
-         String query = "SELECT TicketCost AS ticket_costs_for_flight "+
-                        "FROM FlightInstance fi" + 
-                        "WHERE fi.FlightNumber = '" + flightNumber + "'";
+
+         String query = "SELECT TicketCost AS ticket_costs_for_flight " +
+               "FROM FlightInstance  " +
+               "WHERE FlightNumber = '" + flightNumber + "'";
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
@@ -702,9 +704,51 @@ public class AirlineManagement {
                System.out.println("Customer ID cannot be empty, please try again and enter a valid flight number.");
                return;
             }
+         } catch (Exception e) {
+         System.err.println("Error in feature14: " + e.getMessage());
+         return;
+      }
+      }
 
-
+      public static void feature15(AirlineManagement esql) {
+      try{
+         System.out.print("Enter a Plane ID: ");
+         String planeID = in.readLine();
+            if (planeID == null || planeID.trim().isEmpty()) {
+            System.out.println("Plane ID cannot be empty, please try again and enter a valid plane ID.");
+            return;
          }
+
+         System.out.print("Enter a start date (YYYY-MM-DD): ");
+         String dateRangeStart = in.readLine();
+            if (dateRangeStart == null || dateRangeStart.trim().isEmpty()) {
+            System.out.println("Start date cannot be empty, please try again and enter a valid start range.");
+            return;
+         }
+
+         System.out.print("Enter an end date (YYYY-MM-DD): ");
+         String dateRangeEnd = in.readLine();
+         if (dateRangeEnd == null || dateRangeEnd.trim().isEmpty()) {
+            System.out.println("End date cannot be empty, please try again and enter a valid end range.");
+            return;
+         }
+
+         String query = "SELECT MR.RepairCode AS repair_code, MR.RequestDate AS request_date " +
+                        "FROM MaintenanceRequest MR " +
+                        "WHERE MR.PlaneID = '" + planeID + "' " +
+                        "AND MR.RequestDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' " +
+                        "ORDER BY MR.RequestDate;";
+
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No maintenances were made for this date range/plane.");
+         }
+         return;
+   } catch (Exception e) {
+      System.err.println("Error in feature15: " + e.getMessage());
+         return;
+      }
       }
 }//end AirlineManagement
 
