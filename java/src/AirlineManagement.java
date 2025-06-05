@@ -138,29 +138,28 @@ public class AirlineManagement {
     * @throws java.sql.SQLException when failed to execute the query
     */
    public List<List<String>> executeQueryAndReturnResult (String query) throws SQLException {
-      // creates a statement object
       Statement stmt = this._connection.createStatement ();
-
-      // issues the query instruction
       ResultSet rs = stmt.executeQuery (query);
-
-      /*
-       ** obtains the metadata object for the returned result set.  The metadata
-       ** contains row and column info.
-       */
       ResultSetMetaData rsmd = rs.getMetaData ();
       int numCol = rsmd.getColumnCount ();
-      int rowCount = 0;
 
-      // iterates through the result set and saves the data returned by the query.
-      boolean outputHeader = false;
       List<List<String>> result  = new ArrayList<List<String>>();
+
+      // Add column headers as first row (minimal addition)
+      List<String> headers = new ArrayList<>();
+      for (int i = 1; i <= numCol; i++) {
+          headers.add(rsmd.getColumnLabel(i));  // or getColumnName(i)
+      }
+      result.add(headers);
+
+      // Add data rows
       while (rs.next()){
         List<String> record = new ArrayList<String>();
-		for (int i=1; i<=numCol; ++i)
-			record.add(rs.getString (i));
+        for (int i=1; i<=numCol; ++i)
+            record.add(rs.getString (i));
         result.add(record);
-      }//end while
+      }
+
       stmt.close ();
       return result;
    }//end executeQueryAndReturnResult
@@ -269,8 +268,6 @@ public class AirlineManagement {
               String[] parts = authorisedUser.split("\\|");
                authorisedUser = parts[0];
                String userRole = parts[1];
-               System.out.println(authorisedUser);
-               System.out.println(userRole);
               while(usermenu) {
                 System.out.println("MAIN MENU");
                 System.out.println("---------");
@@ -389,7 +386,7 @@ public class AirlineManagement {
         }
         String checkUserQuery = String.format("SELECT * FROM Users WHERE username = '%s';", username);
         List<List<String>> userCheckResult = esql.executeQueryAndReturnResult(checkUserQuery);
-        if (!userCheckResult.isEmpty()) {
+        if (userCheckResult.size() > 1) {
             System.out.println("Username already exists. please try again with a different username.");
             return;
         }
@@ -454,7 +451,58 @@ public class AirlineManagement {
    }//end
 
 // Rest of the functions definition go in here
+   public static void printTable(List<List<String>> table) {
+    if (table == null || table.isEmpty()) {
+        System.out.println("No data to display.");
+        return;
+    }
 
+    int numCols = table.get(0).size();
+    int[] colWidths = new int[numCols];
+
+    // Calculate max width for each column (consider headers + data)
+    for (List<String> row : table) {
+        for (int i = 0; i < numCols; i++) {
+            String cell = row.get(i) != null ? row.get(i) : "null";
+            if (cell.length() > colWidths[i]) {
+                colWidths[i] = cell.length();
+            }
+        }
+    }
+
+    // Helper to print separator line
+    Runnable printSeparator = () -> {
+        for (int w : colWidths) {
+            System.out.print("+");
+            for (int i = 0; i < w + 2; i++) System.out.print("-");
+        }
+        System.out.println("+");
+    };
+
+    printSeparator.run();
+
+    // Print header row (first row)
+    List<String> header = table.get(0);
+    for (int i = 0; i < numCols; i++) {
+        String cell = header.get(i) != null ? header.get(i) : "null";
+        System.out.printf("| %-"+colWidths[i]+"s ", cell);
+    }
+    System.out.println("|");
+
+    printSeparator.run();
+
+    // Print data rows
+    for (int r = 1; r < table.size(); r++) {
+        List<String> row = table.get(r);
+        for (int i = 0; i < numCols; i++) {
+            String cell = row.get(i) != null ? row.get(i) : "null";
+            System.out.printf("| %-"+colWidths[i]+"s ", cell);
+        }
+        System.out.println("|");
+    }
+
+    printSeparator.run();
+}
    public static void feature1(AirlineManagement esql) {
       // View Flights
       try{
@@ -468,7 +516,7 @@ public class AirlineManagement {
 
          flightNumInput = flightNumInput.trim().toUpperCase();
 
-         String query = "SELECT DayOfWeek, DepartureTime, ArrivalTime " +
+         String query = "SELECT DayOfWeek AS Day_Of_Week, DepartureTime AS Departure_Time, ArrivalTime AS Arrival_Time " +
                    "FROM Schedule " +
                    "WHERE flightNumber = '" + flightNumInput + "' " +
                    "ORDER BY CASE " +
@@ -481,10 +529,12 @@ public class AirlineManagement {
                    "WHEN DayOfWeek = 'Sunday' THEN 7 " +
                    "END";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
-            System.out.println("No flights available.");
-         }
+         // int rowCount = esql.executeQueryAndPrintResult(query);
+         // if (rowCount == 0) {
+         //    System.out.println("No flights available.");
+         // }
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+         printTable(result);
          return;
       } catch (Exception e) {
          System.err.println("Error in feature1: " + e.getMessage());
@@ -515,11 +565,14 @@ public class AirlineManagement {
                         "WHERE FlightNumber = '" + flightNumInput + "' " +
                         "AND FlightDate = '" + dateInput + "' ";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
-            System.out.println("No flight information available.");
-         }
+         // int rowCount = esql.executeQueryAndPrintResult(query);
+         // if (rowCount == 0) {
+         //    System.out.println("No flight information available.");
+         // }
+         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+         printTable(result);
          return;
+2
       } catch (Exception e) {
          System.err.println("Error in feature2: " + e.getMessage());
          return;
