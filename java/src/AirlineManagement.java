@@ -274,7 +274,7 @@ public class AirlineManagement {
               while(usermenu) {
                 System.out.println("MAIN MENU");
                 System.out.println("---------");
-               if(userRole.equals("Manager")){
+               if(userRole.equals("Manager") || userRole.equals("manager")){
                 //**the following functionalities should only be able to be used by Management**
                 System.out.println("1. View Flight's Week Schedule");
                 System.out.println("2. View Flight Seats");
@@ -287,20 +287,20 @@ public class AirlineManagement {
                 System.out.println("9. View Repairs by Date Range");
                 System.out.println("10. View Flight Statistics by Date Range");
                }
-               else if(userRole.equals("Customer")){
+               else if(userRole.equals("Customer") || userRole.equals("customer")){
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
                 System.out.println("12. Find Ticket Cost");
                 System.out.println("13. Find Airplane Type");
                 System.out.println("14. Make a Reservation for a Flight");
                }
-               else if(userRole.equals("Technician")){
+               else if(userRole.equals("Technician") || userRole.equals("technician")){
                 //**the following functionalities should ony be able to be used by Pilots**
                 System.out.println("15. Check a Plane's Maintenances");
                 System.out.println("16. Check a Pilot's Maintenance Requests");
                 System.out.println(".........................");
                }
-               else if(userRole.equals("Pilot")){
+               else if(userRole.equals("Pilot") || userRole.equals("pilot")){
                //**the following functionalities should ony be able to be used by Technicians**
                 System.out.println(".........................");
                 System.out.println(".........................");
@@ -403,7 +403,8 @@ public class AirlineManagement {
 
         System.out.print("\tEnter role: ");
         String role = in.readLine();
-        if (!role.equals("Customer") && !role.equals("Manager") && !role.equals("Pilot") && !role.equals("Technician")) {
+        if (!role.equals("Customer") && !role.equals("Manager") && !role.equals("Pilot") && !role.equals("Technician")
+        && !role.equals("customer") && !role.equals("manager") && !role.equals("pilot") && !role.equals("technician")) {
          System.out.println("Invalid role! Please try again and enter a valid role.");
             return;
          }
@@ -460,17 +461,24 @@ public class AirlineManagement {
          System.out.print("Enter flight number: ");
          String flightNumInput = in.readLine();
 
+         if (flightNumInput == null || flightNumInput.trim().isEmpty()) {
+            System.out.println("Flight number cannot be empty, please try again and enter a valid flight.");
+            return;
+         }
+
+         flightNumInput = flightNumInput.trim().toUpperCase();
+
          String query = "SELECT DayOfWeek, DepartureTime, ArrivalTime " +
                    "FROM Schedule " +
                    "WHERE flightNumber = '" + flightNumInput + "' " +
                    "ORDER BY CASE " +
-                   "WHEN DayOfWeek = 'Monday' THEN 1" +
-                   "WHEN DayOfWeek = 'Tuesday' THEN 2" +
-                   "WHEN DayOfWeek = 'Wednesday' THEN 3" +
-                   "WHEN DayOfWeek = 'Thursday' THEN 4" +
-                   "WHEN DayOfWeek = 'Friday' THEN 5" +
-                   "WHEN DayOfWeek = 'Saturday' THEN 6" +
-                   "WHEN DayOfWeek = 'Sunday' THEN 7" +
+                   "WHEN DayOfWeek = 'Monday' THEN 1 " +
+                   "WHEN DayOfWeek = 'Tuesday' THEN 2 " +
+                   "WHEN DayOfWeek = 'Wednesday' THEN 3 " +
+                   "WHEN DayOfWeek = 'Thursday' THEN 4 " +
+                   "WHEN DayOfWeek = 'Friday' THEN 5 " +
+                   "WHEN DayOfWeek = 'Saturday' THEN 6 " +
+                   "WHEN DayOfWeek = 'Sunday' THEN 7 " +
                    "END";
 
          int rowCount = esql.executeQueryAndPrintResult(query);
@@ -489,8 +497,18 @@ public class AirlineManagement {
       try{
          System.out.print("Enter flight number: ");
          String flightNumInput = in.readLine();
+         if (flightNumInput == null || flightNumInput.trim().isEmpty()) {
+            System.out.println("Flight number cannot be empty, please try again and enter a valid flight.");
+            return;
+        }
+        flightNumInput = flightNumInput.trim().toUpperCase();
+
          System.out.print("Enter a date: ");
          String dateInput = in.readLine();
+         if (dateInput == null || dateInput.trim().isEmpty()) {
+            System.out.println("Date cannot be empty, please try again and enter a date.");
+            return;
+        }
 
          String query = "SELECT SeatsTotal - SeatsSold AS seats_available, SeatsSold AS seats_sold " + 
                         "FROM FlightInstance " +
@@ -499,7 +517,7 @@ public class AirlineManagement {
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
-            System.out.println("No flights available.");
+            System.out.println("No flight information available.");
          }
          return;
       } catch (Exception e) {
@@ -512,8 +530,17 @@ public class AirlineManagement {
       try{
          System.out.print("Enter flight number: ");
          String flightNumInput = in.readLine();
+         if (flightNumInput == null || flightNumInput.trim().isEmpty()) {
+            System.out.println("Flight number cannot be empty, please try again and enter a valid flight.");
+            return;
+        }
+         flightNumInput = flightNumInput.trim().toUpperCase();
          System.out.print("Enter a date: ");
          String dateInput = in.readLine();
+         if (dateInput == null || dateInput.trim().isEmpty()) {
+            System.out.println("Date cannot be empty, please try again and enter a date.");
+            return;
+        }
 
          String query = "SELECT FlightNumber, FlightDate, " +
                      "CASE " +
@@ -532,7 +559,7 @@ public class AirlineManagement {
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
-            System.out.println("No flights available.");
+            System.out.println("No flight information available.");
          }
          return;
       } catch (Exception e) {
@@ -545,6 +572,10 @@ public class AirlineManagement {
       try{
          System.out.print("Enter a date: ");
          String dateInput = in.readLine();
+         if (dateInput == null || dateInput.trim().isEmpty()) {
+            System.out.println("Date cannot be empty, please try again and enter a date.");
+            return;
+        }
 
          String query = "SELECT fi.FlightNumber, f.DepartureCity, f.ArrivalCity, s.DepartureTime, s.ArrivalTime " +
                      "FROM FlightInstance fi JOIN Schedule s ON fi.FlightNumber = s.FlightNumber " +
@@ -554,7 +585,7 @@ public class AirlineManagement {
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
-            System.out.println("No flights available.");
+            System.out.println("No flights on this date.");
          }
          return;
       } catch (Exception e) {
@@ -567,8 +598,17 @@ public class AirlineManagement {
       try{
          System.out.print("Enter flight number: ");
          String flightNumInput = in.readLine();
+         if (flightNumInput == null || flightNumInput.trim().isEmpty()) {
+            System.out.println("Flight number cannot be empty, please try again and enter a valid flight.");
+            return;
+        }
+        flightNumInput = flightNumInput.trim().toUpperCase();
          System.out.print("Enter a date: ");
          String dateInput = in.readLine();
+         if (dateInput == null || dateInput.trim().isEmpty()) {
+            System.out.println("Date cannot be empty, please try again and enter a date.");
+            return;
+        }
 
          String query = "SELECT FirstName, LastName, Status " +
                         "FROM Customer c JOIN Reservation r on c.CustomerID = r.CustomerID " +
@@ -578,7 +618,7 @@ public class AirlineManagement {
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
-            System.out.println("No flights available.");
+            System.out.println("No passaenger information available");
          }
          return;
       } catch (Exception e) {
@@ -591,7 +631,11 @@ public class AirlineManagement {
       try{
          System.out.print("Enter a Reservation Number: ");
          String reservationNumInput = in.readLine();
-         
+         if (reservationNumInput == null || reservationNumInput.trim().isEmpty()) {
+            System.out.println("Reservation Number cannot be empty, please try again and enter a reservation.");
+            return;
+        }
+         reservationNumInput = reservationNumInput.trim().toUpperCase();
 
          String query = "SELECT FirstName, LastName, Gender, DOB, Address, Phone, Zip " + 
                         "FROM Customer c JOIN Reservation r on c.CustomerID = r.CustomerID " + 
@@ -599,7 +643,7 @@ public class AirlineManagement {
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
-            System.out.println("No flights available.");
+            System.out.println("No traveler information available.");
          }
          return;
       } catch (Exception e) {
@@ -612,6 +656,11 @@ public class AirlineManagement {
       try{
          System.out.print("Enter a Plane ID: ");
          String planeIDInput = in.readLine();
+         if (planeIDInput == null || planeIDInput.trim().isEmpty()) {
+            System.out.println("Plane ID cannot be empty, please try again and enter a plane.");
+            return;
+        }
+         planeIDInput = planeIDInput.trim().toUpperCase();
 
          String query = "SELECT Make, Model, EXTRACT(YEAR FROM CURRENT_DATE) - Year AS Age(in years) " + 
                         "FROM Plane p " + 
@@ -619,7 +668,7 @@ public class AirlineManagement {
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
-            System.out.println("No flights available.");
+            System.out.println("No plane information available.");
          }
          return;
       } catch (Exception e) {
@@ -632,6 +681,11 @@ public class AirlineManagement {
       try{
          System.out.print("Enter a Technician ID: ");
          String technicianIDInput = in.readLine();
+         if (technicianIDInput == null || technicianIDInput.trim().isEmpty()) {
+            System.out.println("Technician ID cannot be empty, please try again and enter a technician.");
+            return;
+        }
+         technicianIDInput = technicianIDInput.trim().toUpperCase();
 
          String query = "SELECT PlaneID, RepairCode, RepairDate " +
                         "FROM Repair r join Technician t ON r.TechnicianID = t.TechnicianID " +
@@ -639,7 +693,7 @@ public class AirlineManagement {
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
-            System.out.println("No flights available.");
+            System.out.println("No repair information available.");
          }
          return;
       } catch (Exception e) {
@@ -652,6 +706,11 @@ public class AirlineManagement {
       try{
          System.out.print("Enter a Plane ID: ");
          String planeIDInput = in.readLine();
+         if (planeIDInput == null || planeIDInput.trim().isEmpty()) {
+            System.out.println("Plane ID cannot be empty, please try again and enter a plane.");
+            return;
+        }
+         planeIDInput = planeIDInput.trim().toUpperCase();
 
          System.out.print("Enter a start date (YYYY-MM-DD): ");
          String dateRangeStart = in.readLine();
@@ -684,7 +743,7 @@ public class AirlineManagement {
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
-            System.out.println("No flights available.");
+            System.out.println("No repair information available.");
          }
          return;
       } catch (Exception e) {
@@ -696,7 +755,12 @@ public class AirlineManagement {
       //
       try{
          System.out.print("Enter a Flight Number: ");
-         String flightNumberInput = in.readLine();
+         String flightNumInput = in.readLine();
+         if (flightNumInput == null || flightNumInput.trim().isEmpty()) {
+            System.out.println("Flight number cannot be empty, please try again and enter a valid flight.");
+            return;
+        }
+         flightNumInput = flightNumInput.trim().toUpperCase();
 
          System.out.print("Enter a start date (MM/DD/YY): ");
          String dateRangeStart = in.readLine();
@@ -726,12 +790,12 @@ public class AirlineManagement {
                "SUM(SeatsSold) AS Sold_Tickets, " +
                "SUM(SeatsTotal - SeatsSold) AS Unsold_Tickets " +
                "FROM FlightInstance " +
-               "WHERE FlightNumber = '" + flightNumberInput + "' " +
+               "WHERE FlightNumber = '" + flightNumInput + "' " +
                "AND FlightDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' ";
 
          int rowCount = esql.executeQueryAndPrintResult(query);
          if (rowCount == 0) {
-            System.out.println("No flights available.");
+            System.out.println("No flight statistics available.");
          }
          return;
       } catch (Exception e) {
