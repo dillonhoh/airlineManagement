@@ -138,6 +138,33 @@ public class AirlineManagement {
     * @throws java.sql.SQLException when failed to execute the query
     */
    public List<List<String>> executeQueryAndReturnResult (String query) throws SQLException {
+      // creates a statement object
+      Statement stmt = this._connection.createStatement ();
+
+      // issues the query instruction
+      ResultSet rs = stmt.executeQuery (query);
+
+      /*
+       ** obtains the metadata object for the returned result set.  The metadata
+       ** contains row and column info.
+       */
+      ResultSetMetaData rsmd = rs.getMetaData ();
+      int numCol = rsmd.getColumnCount ();
+      int rowCount = 0;
+
+      // iterates through the result set and saves the data returned by the query.
+      boolean outputHeader = false;
+      List<List<String>> result  = new ArrayList<List<String>>();
+      while (rs.next()){
+        List<String> record = new ArrayList<String>();
+		for (int i=1; i<=numCol; ++i)
+			record.add(rs.getString (i));
+        result.add(record);
+      }//end while
+      stmt.close ();
+      return result;
+   }
+   public List<List<String>> executeQueryAndReturnResultHeaders (String query) throws SQLException {
       Statement stmt = this._connection.createStatement ();
       ResultSet rs = stmt.executeQuery (query);
       ResultSetMetaData rsmd = rs.getMetaData ();
@@ -162,7 +189,9 @@ public class AirlineManagement {
 
       stmt.close ();
       return result;
-   }//end executeQueryAndReturnResult
+   }
+   
+   //end executeQueryAndReturnResultHeaders
 
    /**
     * Method to execute an input query SQL instruction (i.e. SELECT).  This
@@ -250,6 +279,7 @@ public class AirlineManagement {
          boolean keepon = true;
          while(keepon) {
             // These are sample SQL statements
+            System.out.println();
             System.out.println("MAIN MENU");
             System.out.println("---------");
             System.out.println("1. Create user");
@@ -387,11 +417,12 @@ public class AirlineManagement {
             return;
         }
         String checkUserQuery = String.format("SELECT * FROM Users WHERE username = '%s';", username);
-        List<List<String>> userCheckResult = esql.executeQueryAndReturnResult(checkUserQuery);
+        List<List<String>> userCheckResult = esql.executeQueryAndReturnResultHeaders(checkUserQuery);
         if (userCheckResult.size() > 1) {
             System.out.println("Username already exists. please try again with a different username.");
             return;
         }
+       
 
         System.out.print("\tEnter password: ");
         String password = in.readLine();
@@ -437,11 +468,13 @@ public class AirlineManagement {
         }
 
         String query = String.format("SELECT role FROM Users WHERE username = '%s' AND password = '%s';", username, password);
-        List<List<String>> results = esql.executeQueryAndReturnResult(query);
+        List<List<String>> results = esql.executeQueryAndReturnResultHeaders(query);
+        
+        
 
-        if (results.size() > 0) {
+        if (results.size() > 1) {
             System.out.println("Login successful!");
-            return username + "|" + results.get(0).get(0); // e.g., "johndoe|Manager"
+            return username + "|" + results.get(1).get(0); // e.g., "johndoe|Manager"
         } else {
             System.out.println("User not found or password incorrect.");
             return null;
@@ -531,11 +564,13 @@ public class AirlineManagement {
                    "WHEN DayOfWeek = 'Sunday' THEN 7 " +
                    "END";
 
-         // int rowCount = esql.executeQueryAndPrintResult(query);
-         // if (rowCount == 0) {
-         //    System.out.println("No flights available.");
-         // }
-         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+         
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
+            System.out.println("No flight information available.");
+            System.out.println();
+            return;
+         }
          printTable(result);
          return;
       } catch (Exception e) {
@@ -555,26 +590,32 @@ public class AirlineManagement {
         }
         flightNumInput = flightNumInput.trim().toUpperCase();
 
-         System.out.print("Enter a date: ");
+         System.out.print("Enter a date (MM/DD/YY): ");
          String dateInput = in.readLine();
          if (dateInput == null || dateInput.trim().isEmpty()) {
             System.out.println("Date cannot be empty, please try again and enter a date.");
             return;
         }
+        if (!dateInput.matches("\\d{1,2}/\\d{1,2}/\\d{2}")) {
+            System.out.println("Invalid date format. Please use MM/DD/YY.");
+            return;
+         }
 
          String query = "SELECT SeatsTotal - SeatsSold AS seats_available, SeatsSold AS seats_sold " + 
                         "FROM FlightInstance " +
                         "WHERE FlightNumber = '" + flightNumInput + "' " +
                         "AND FlightDate = '" + dateInput + "' ";
 
-         // int rowCount = esql.executeQueryAndPrintResult(query);
-         // if (rowCount == 0) {
-         //    System.out.println("No flight information available.");
-         // }
-         List<List<String>> result = esql.executeQueryAndReturnResult(query);
+         
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
+            System.out.println("No flight information available.");
+            System.out.println();
+            return;
+         }
          printTable(result);
          return;
-2
+
       } catch (Exception e) {
          System.err.println("Error in feature2: " + e.getMessage());
          return;
@@ -590,14 +631,18 @@ public class AirlineManagement {
             return;
         }
          flightNumInput = flightNumInput.trim().toUpperCase();
-         System.out.print("Enter a date: ");
+         System.out.print("Enter a date (MM/DD/YY): ");
          String dateInput = in.readLine();
          if (dateInput == null || dateInput.trim().isEmpty()) {
             System.out.println("Date cannot be empty, please try again and enter a date.");
             return;
         }
+        if (!dateInput.matches("\\d{1,2}/\\d{1,2}/\\d{2}")) {
+            System.out.println("Invalid date format. Please use MM/DD/YY.");
+            return;
+         }
 
-         String query = "SELECT FlightNumber, FlightDate, " +
+         String query = "SELECT FlightNumber AS flight_number, FlightDate AS flight_date, " +
                      "CASE " +
                         "WHEN DepartedOnTime THEN 'Yes' " +
                         "WHEN NOT DepartedOnTime THEN 'No' " +
@@ -612,10 +657,13 @@ public class AirlineManagement {
                      "WHERE FlightNumber = '" + flightNumInput + "' " +
                      "AND FlightDate = '" + dateInput + "'";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("No flight information available.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
       } catch (Exception e) {
          System.err.println("Error in feature3: " + e.getMessage());
@@ -625,23 +673,30 @@ public class AirlineManagement {
    public static void feature4(AirlineManagement esql) {
       // View Flights of the day
       try{
-         System.out.print("Enter a date: ");
+         System.out.print("Enter a date (MM/DD/YY): ");
          String dateInput = in.readLine();
          if (dateInput == null || dateInput.trim().isEmpty()) {
             System.out.println("Date cannot be empty, please try again and enter a date.");
             return;
         }
+        if (!dateInput.matches("\\d{1,2}/\\d{1,2}/\\d{2}")) {
+            System.out.println("Invalid date format. Please use MM/DD/YY.");
+            return;
+         }
 
-         String query = "SELECT fi.FlightNumber, f.DepartureCity, f.ArrivalCity, s.DepartureTime, s.ArrivalTime " +
+         String query = "SELECT fi.FlightNumber AS flight_number, f.DepartureCity AS departure_city, f.ArrivalCity AS arrival_city, s.DepartureTime AS departure_time, s.ArrivalTime AS arrival_time " +
                      "FROM FlightInstance fi JOIN Schedule s ON fi.FlightNumber = s.FlightNumber " +
                      "JOIN Flight f ON fi.FlightNumber = f.FlightNumber " +
                      "WHERE fi.FlightDate = '" + dateInput + "'" +
                      "AND TRIM(TO_CHAR(fi.FlightDate, 'Day')) = s.DayOfWeek";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("No flights on this date.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
       } catch (Exception e) {
          System.err.println("Error in feature4: " + e.getMessage());
@@ -658,23 +713,30 @@ public class AirlineManagement {
             return;
         }
         flightNumInput = flightNumInput.trim().toUpperCase();
-         System.out.print("Enter a date: ");
+         System.out.print("Enter a date (MM/DD/YY): ");
          String dateInput = in.readLine();
          if (dateInput == null || dateInput.trim().isEmpty()) {
             System.out.println("Date cannot be empty, please try again and enter a date.");
             return;
         }
+        if (!dateInput.matches("\\d{1,2}/\\d{1,2}/\\d{2}")) {
+            System.out.println("Invalid date format. Please use MM/DD/YY.");
+            return;
+         }
 
-         String query = "SELECT FirstName, LastName, Status " +
+         String query = "SELECT FirstName AS first_name, LastName AS last_name, Status " +
                         "FROM Customer c JOIN Reservation r on c.CustomerID = r.CustomerID " +
                         "JOIN FlightInstance fi ON fi.FlightInstanceID = r.FlightInstanceID " +
                         "WHERE fi.FlightNumber = '" + flightNumInput + "' " +
                         "AND fi.FlightDate = '" + dateInput + "' ";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
-            System.out.println("No passaenger information available");
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
+            System.out.println("No passenger information available.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
       } catch (Exception e) {
          System.err.println("Error in feature5: " + e.getMessage());
@@ -692,14 +754,17 @@ public class AirlineManagement {
         }
          reservationNumInput = reservationNumInput.trim().toUpperCase();
 
-         String query = "SELECT FirstName, LastName, Gender, DOB, Address, Phone, Zip " + 
+         String query = "SELECT FirstName AS first_name, LastName AS last_name, Gender, DOB, Address, Phone, Zip " + 
                         "FROM Customer c JOIN Reservation r on c.CustomerID = r.CustomerID " + 
                         "WHERE r.ReservationID = '" + reservationNumInput + "'";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("No traveler information available.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
       } catch (Exception e) {
          System.err.println("Error in feature6: " + e.getMessage());
@@ -717,14 +782,17 @@ public class AirlineManagement {
         }
          planeIDInput = planeIDInput.trim().toUpperCase();
 
-         String query = "SELECT Make, Model, EXTRACT(YEAR FROM CURRENT_DATE) - Year AS Age(in years) " + 
+         String query = "SELECT Make, Model, EXTRACT(YEAR FROM CURRENT_DATE) - Year AS Age " + 
                         "FROM Plane p " + 
                         "WHERE p.PlaneID = '" + planeIDInput + "'";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("No plane information available.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
       } catch (Exception e) {
          System.err.println("Error in feature7: " + e.getMessage());
@@ -742,14 +810,17 @@ public class AirlineManagement {
         }
          technicianIDInput = technicianIDInput.trim().toUpperCase();
 
-         String query = "SELECT PlaneID, RepairCode, RepairDate " +
+         String query = "SELECT PlaneID, RepairCode AS repair_code, RepairDate AS repair_date " +
                         "FROM Repair r join Technician t ON r.TechnicianID = t.TechnicianID " +
                         "WHERE t.technicianID = '" + technicianIDInput + "'";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("No repair information available.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
       } catch (Exception e) {
          System.err.println("Error in feature8: " + e.getMessage());
@@ -791,15 +862,18 @@ public class AirlineManagement {
             return;
          }
 
-         String query = "SELECT RepairDate, RepairCode, TechnicianID " +
+         String query = "SELECT RepairDate AS repair_date, RepairCode AS repair_code, TechnicianID " +
                         "FROM Repair r " +
                         "WHERE r.PlaneID = '" + planeIDInput + "' " +
                         "AND r.RepairDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' ";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("No repair information available.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
       } catch (Exception e) {
          System.err.println("Error in feature9: " + e.getMessage());
@@ -848,10 +922,13 @@ public class AirlineManagement {
                "WHERE FlightNumber = '" + flightNumInput + "' " +
                "AND FlightDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' ";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("No flight statistics available.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
       } catch (Exception e) {
          System.err.println("Error in feature10: " + e.getMessage());
@@ -882,10 +959,13 @@ public class AirlineManagement {
                         "JOIN FlightInstance fi2 ON f.FlightNumber = fi2.FlightNumber " +
                         "WHERE f.ArrivalCity ILIKE '" + destination + "'AND f.DepartureCity ILIKE '" + departureCity + "' " +
                         "GROUP BY f.FlightNumber, s.DepartureTime, s.ArrivalTime, fi.NumOfStops";
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
-            System.out.println("No flights available.");
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
+            System.out.println("No Flights Available.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
       } catch (Exception e) {
       System.err.println("Error in feature11: " + e.getMessage());
@@ -902,14 +982,18 @@ public class AirlineManagement {
             return;
       }
 
-         String query = "SELECT TicketCost AS ticket_costs_for_flight " +
+         String query = "SELECT FlightInstanceID AS flight_instance, TicketCost AS ticket_costs_for_flight, FlightDate AS flight_date " +
                "FROM FlightInstance  " +
-               "WHERE FlightNumber = '" + flightNumber + "'";
+               "WHERE FlightNumber = '" + flightNumber + "'" + 
+               "ORDER BY FlightInstanceID";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("No tickets available for this flight.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
    } catch (Exception e) {
       System.err.println("Error in feature12: " + e.getMessage());
@@ -930,10 +1014,13 @@ public class AirlineManagement {
                         "JOIN Plane p ON f.PlaneID = p.PlaneID " +
                         "WHERE FlightNumber = '" + flightNumber + "'";
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("Flight number does not exist or no plane associated with this flight.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
    } catch (Exception e) {
       System.err.println("Error in feature13: " + e.getMessage());
@@ -998,8 +1085,9 @@ public static void feature14(AirlineManagement esql) {
 
       String latestCustomerID = "SELECT MAX(CustomerID) FROM Customer;";
       List<List<String>> result = esql.executeQueryAndReturnResult(latestCustomerID);
-
+      
       int nextCustomerID = 1; 
+
       if (result != null && !result.isEmpty() && result.get(0).get(0) != null) {
          nextCustomerID = Integer.parseInt(result.get(0).get(0)) + 1;
       }
@@ -1061,6 +1149,7 @@ public static void feature14(AirlineManagement esql) {
       }
 
    } catch (Exception e) {
+      
       System.err.println("Error in feature14: " + e.getMessage());
       return;
    }
@@ -1100,17 +1189,20 @@ public static void feature14(AirlineManagement esql) {
             return;
          }
 
-         String query = "SELECT mr.RepairCode AS repair_code, mr.RequestDate AS request_date " +
-                        "FROM MaintenanceRequest mr " +
-                        "WHERE mr.PlaneID = '" + planeID + "' " +
-                        "AND mr.RequestDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' " +
-                        "ORDER BY mr.RequestDate";
+         String query = "SELECT r.RepairCode AS repair_code, r.RepairDate AS repair_date " +
+                        "FROM Repair r " +
+                        "WHERE r.PlaneID = '" + planeID + "' " +
+                        "AND r.RepairDate BETWEEN DATE '" + dateRangeStart + "' AND DATE '" + dateRangeEnd + "' " +
+                        "ORDER BY r.RepairDate";
 
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("No maintenances were made for this date range/plane.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
    } catch (Exception e) {
       System.err.println("Error in feature15: " + e.getMessage());
@@ -1134,10 +1226,13 @@ public static void feature14(AirlineManagement esql) {
                         "ORDER BY mr.RequestDate;";
 
 
-         int rowCount = esql.executeQueryAndPrintResult(query);
-         if (rowCount == 0) {
+         List<List<String>> result = esql.executeQueryAndReturnResultHeaders(query);
+         if (result.size() <= 1) {
             System.out.println("Pilot did not make any maintenance requests.");
+            System.out.println();
+            return;
          }
+         printTable(result);
          return;
    } catch (Exception e) {
       System.err.println("Error in feature16: " + e.getMessage());
