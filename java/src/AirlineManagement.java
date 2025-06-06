@@ -782,7 +782,7 @@ public class AirlineManagement {
         }
          planeIDInput = planeIDInput.trim().toUpperCase();
 
-         String query = "SELECT Make, Model, EXTRACT(YEAR FROM CURRENT_DATE) - Year AS Age " + 
+         String query = "SELECT Make, Model, EXTRACT(YEAR FROM CURRENT_DATE) - Year AS Age, LastRepairDate AS last_repair_date " + 
                         "FROM Plane p " + 
                         "WHERE p.PlaneID = '" + planeIDInput + "'";
 
